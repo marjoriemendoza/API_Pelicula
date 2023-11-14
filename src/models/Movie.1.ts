@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinTable,
+  RelationId,
+  Collection,
+} from "typeorm";
+import { Genero } from "./Genero";
 
 @Entity()
 export class Movie {
@@ -7,9 +16,6 @@ export class Movie {
 
   @Column()
   title: string;
-
-  @Column()
-  genre: string;
 
   @Column()
   duration: string;
@@ -23,6 +29,14 @@ export class Movie {
   @Column()
   image: string;
 
+  @Column()
+  ranking: number;
+
   @Column({ default: true })
   state: boolean;
+
+  @RelationId((movie: Movie) => movie.genero)
+  @ManyToOne(() => Genero)
+  genero: Genero;
+
 }
