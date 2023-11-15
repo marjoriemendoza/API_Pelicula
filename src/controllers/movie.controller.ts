@@ -1,7 +1,9 @@
+import { Movie } from './../models/Movie.1';
 import { Genero } from './../models/Genero';
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
-import { Movie } from "../models/Movie.1";
+
+import { getRepository, Like } from 'typeorm';
 const movieRepository = AppDataSource.getRepository(Movie);
 
 class MovieController {
@@ -31,9 +33,24 @@ class MovieController {
     }
   };
 
-  static getMovies = async (_: Request, res: Response) => {
+  static getMovies = async (req: Request, res: Response) => {
+    const title = req.query.title || "";
+    
+    const genero = req.query.genero || ""
+    const generoId = req.query.generoId || ""
+    const repoMovie = AppDataSource.getRepository(Movie)
+
+    
     try {
-      const movie = await movieRepository.find({ where: { state: true } });
+      const movie = await movieRepository.find({ 
+        where :    { 
+          state: true,
+          title:Like(`%${title}%`), 
+          genero: {type: Like(`%${genero}%`)},
+        },
+      relations: {genero:true},
+    
+    });
       return movie.length > 0
         ? res.json({ ok: true, movie })
         : res.json({ ok: false, message: "there's nothig here fool" });
@@ -45,12 +62,21 @@ class MovieController {
     }
   };
 
-  static getMoviesbyId = async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id);
-
+  static getMoviesGenero = async (req: Request, res: Response) => {
+    const generoId = Number(req.params.id) || 0;   
+   
+    const repoMovie = AppDataSource.getRepository(Movie)  
     try {
-      const movie = await movieRepository.findOne({ where: { id, state: true } });
-      return movie
+      const movie = await movieRepository.find({ 
+        where :    { 
+          state: true,
+        
+          genero: {id:generoId},
+        },
+      relations: {genero:true},
+    
+    });
+      return movie.length > 0
         ? res.json({ ok: true, movie })
         : res.json({ ok: false, message: "there's nothig here fool" });
     } catch (error) {
@@ -59,7 +85,44 @@ class MovieController {
         message: `error = ${error.message}`,
       });
     }
-  }; 
+  };
+
+
+
+
+
+
+
+
+  static getMoviesbyId = async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
+    const generoId = req.query.generoId || "";
+
+    try {
+      const movie = await movieRepository.findOne({
+        where: {
+          id,
+          state: true,
+          
+        },
+        relations: {genero: true}, 
+      });
+
+      return movie
+        ? res.json({ ok: true, movie })
+        : res.json({ ok: false, message: "No hay nada aquí, tonto" });
+    } catch (error) {
+      return res.json({
+        ok: false,
+        message: `Error: ${error.message}`,
+      });
+    }
+  };
+
+  
+
+
+
   static DeleteMovie = async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
 

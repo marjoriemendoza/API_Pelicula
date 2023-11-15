@@ -6,6 +6,7 @@ import {
   JoinTable,
   RelationId,
   Collection,
+  JoinColumn,
 } from "typeorm";
 import { Genero } from "./Genero";
 
@@ -35,8 +36,14 @@ export class Movie {
   @Column({ default: true })
   state: boolean;
 
-  @RelationId((movie: Movie) => movie.genero)
   @ManyToOne(() => Genero)
-  genero: Genero;
+  genero: Genero
 
-}
+  @RelationId((movie:Movie)=>movie.genero)
+  generoId: number
+
+
+
+  }
+
+
