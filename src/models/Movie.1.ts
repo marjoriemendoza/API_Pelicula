@@ -37,13 +37,8 @@ export class Movie {
   state: boolean;
 
   @ManyToOne(() => Genero)
-  genero: Genero
+  genero: Genero;
 
-  @RelationId((movie:Movie)=>movie.genero)
-  generoId: number
-
-
-
-  }
-
-
+  @RelationId((movie: Movie) => movie.genero)
+  generoId: number;
+}

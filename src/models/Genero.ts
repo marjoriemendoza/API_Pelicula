@@ -1,15 +1,17 @@
-import {Entity,PrimaryGeneratedColumn,Column} from 'typeorm'
-
+import {Entity,PrimaryGeneratedColumn,Column, ManyToOne, JoinColumn,} from 'typeorm'
+import {Movie} from './Movie.1'
 @Entity()
 export class Genero{
-@PrimaryGeneratedColumn()
 
+@PrimaryGeneratedColumn()
 id:number
 
 @Column()
-type:string
+type:string;
 
 @Column({default:true})
-state:boolean
+state:boolean;
+
 
 }
+

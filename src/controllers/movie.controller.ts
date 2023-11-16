@@ -78,7 +78,7 @@ class MovieController {
     });
       return movie.length > 0
         ? res.json({ ok: true, movie })
-        : res.json({ ok: false, message: "there's nothig here fool" });
+        : res.json({ ok: false, message: "that Id doesn't exist" });
     } catch (error) {
       return res.json({
         ok: false,
@@ -86,11 +86,6 @@ class MovieController {
       });
     }
   };
-
-
-
-
-
 
 
 
@@ -120,9 +115,6 @@ class MovieController {
   };
 
   
-
-
-
   static DeleteMovie = async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
 
