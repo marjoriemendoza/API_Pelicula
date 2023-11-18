@@ -1,5 +1,6 @@
 import {  Entity,  PrimaryGeneratedColumn,  Column,  ManyToOne,  RelationId,  Collection, CreateDateColumn,} from "typeorm";
 import { Movie } from "./Movie.1";
+import {Cliente} from "./Cliente"
 @Entity()
 
 export class RentMovie
@@ -9,11 +10,12 @@ export class RentMovie
 
   @ManyToOne(() => Movie)
   movie: Movie;
-
   @RelationId((rentmovie: RentMovie) => rentmovie.movie)
   movie_id: number;
   
-  @Column()
+  @ManyToOne(() => Cliente)
+  cliente: Cliente;
+  @RelationId((rentmovie: RentMovie) => rentmovie.cliente)
   id_costumer: number
 
   @Column()
@@ -24,7 +26,20 @@ export class RentMovie
   devolution_date: Date
 
   @Column()
+  amount: number
+
+  @Column()
   price: number
+
+ 
+
+  @Column({default:0})
+  subTotal: number
+
+  @Column({default:0})
+  total: number
+
+  
 
   @Column({default: true})
   state: boolean

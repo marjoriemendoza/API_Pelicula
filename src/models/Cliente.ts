@@ -17,6 +17,9 @@ phone:string
 @Column()
 age:string
 
+@Column()
+points: number
+
 @Column({default:true})
 state:boolean
 
