@@ -80,7 +80,7 @@ return res.json({
         })
     }
   }
-  static UpdateCliente =async(req:Request,res:Response)=>{
+  public static UpdateCliente =async(req:Request,res:Response)=>{
     const id = parseInt(req.params.id)
     const {name,lastName,age,phone,} = req.body
     let cliente:Cliente
