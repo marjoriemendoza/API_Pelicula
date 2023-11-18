@@ -2,6 +2,7 @@
 import {Response,Request} from 'express'
 import { AppDataSource } from '../data-source'
 import { Cliente } from '../models/Cliente'
+import {paginate} from '../pagination'
 
 
 const clienteRepository = AppDataSource.getRepository(Cliente)
@@ -38,9 +39,14 @@ return res.json({
   static getClientes = async(req:Request,res:Response)=>{
     
     try {
-        const cliente= await clienteRepository.find({where:{state:true}})
-        return cliente.length>0
-        ? res.json({ok:true,cliente}): res.json({ok:false,message:"not found"})
+      const page = parseInt(req.query.page as string) || 1;
+      const perPage = parseInt(req.query.per_page as string) || 10;
+
+      const paginatedResult = await paginate(clienteRepository, page, perPage, { state: true });
+
+      return paginatedResult.data.length > 0
+        ? res.json({ ...paginatedResult, ok: true })
+        : res.json({ ok: false, message: 'Not found' });
     } catch (error) {
         return res.json({
             ok: false,
