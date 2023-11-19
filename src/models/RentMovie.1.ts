@@ -11,7 +11,7 @@ export class RentMovie
   @ManyToOne(() => Movie)
   movie: Movie;
   @RelationId((rentmovie: RentMovie) => rentmovie.movie)
-  movie_id: number;
+  id_movie: number;
   
   @ManyToOne(() => Cliente)
   cliente: Cliente;

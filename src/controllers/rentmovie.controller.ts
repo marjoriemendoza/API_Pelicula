@@ -11,38 +11,51 @@ const rentmovieRepository = AppDataSource.getRepository(RentMovie);
 
 class RentMovieController{
     static createRent = async (req: Request, res: Response) => {
-      const { id_movie, id_costumer, loan_date, devolution_date, price, amount, subTotal, total, points} = req.body;
+      const { movie_id, id_costumer, loan_date, devolution_date, price, amount, subTotal, total, } = req.body;
       const clienteRepository = AppDataSource.getRepository(Cliente)
+
 
     try {
       const rent = new RentMovie();
-      rent.movie = id_movie;
-      rent.cliente = id_costumer;
-      rent.loan_date = loan_date;
-      rent.devolution_date = devolution_date;
-      rent.price = price;
-      rent.amount = amount;
-      rent.subTotal= price*amount;
-      rent.total = total;
+        rent.movie = movie_id
+        rent.cliente = id_costumer;
+        rent.loan_date = loan_date;
+        rent.devolution_date = devolution_date;
+        rent.amount = amount;
+        rent.price = price;        
+        rent.subTotal= subTotal;
+        rent.total = total;
 
-      const client = new Cliente();
-
-      const client_f = await clienteRepository.findOne({where: {id: id_costumer}})
-      
-      if(client_f){
-        client_f.points = client_f.points+1
-
-        clienteRepository.save(client_f)
-      }
-
+        let st = price * amount;
+        rent.subTotal = st;
+        rent.total = parseFloat((rent.subTotal).toFixed(2)) 
+        let disc1 = subTotal * 0.15;
+       
+        const client_f = await clienteRepository.findOne({where: {id: id_costumer}})
        
 
-      let discount1 = 0.15*price
-      let discount2= 0.20 * price  
-
-      await rentmovieRepository.save(rent);
-
-      return res.json({ ok: true,  message: "Rent was created", });
+        if (client_f.points>=10 && client_f.points<20) {
+          client_f.points = client_f.points + rent.amount
+          rent.total=parseFloat((rent.subTotal - (rent.subTotal * 0.10)).toFixed(2));
+          
+          await rentmovieRepository.save(rent);
+          clienteRepository.save(client_f)
+          return res.json({ ok: true,  message: "poins are 10 or more get a 15% discount rent was creaetd", });  
+        }else if (client_f.points>20) {
+          client_f.points = client_f.points + rent.amount
+          rent.total= rent.subTotal - (rent.subTotal*0.20)
+          await rentmovieRepository.save(rent);
+          clienteRepository.save(client_f)
+          return res.json({ ok: true,  message: "poins are 20 or more get a 20% discount rent was creaetd", });
+        }else{
+          client_f.points = client_f.points + rent.amount
+        
+          await rentmovieRepository.save(rent);
+          clienteRepository.save(client_f)
+          return res.json({ ok: true,  message: " rent was creaetd", }); 
+        }
+      
+      
     } catch (error) {
       return res.json({ok: false,message: `error that movie does not exist = ${error.message}`,});
     }
@@ -113,7 +126,7 @@ class RentMovieController{
         throw new Error("not found");
       }
       const rent = new RentMovie();
-      rentmovie.movie = id_movie;
+      rentmovie.id_movie = id_movie;
       rentmovie.id_costumer = id_costumer;
       rentmovie.loan_date = loan_date;
       rentmovie.devolution_date = devolution_date
