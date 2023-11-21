@@ -38,7 +38,6 @@ export class Movie {
 
   @ManyToOne(() => Genero)
   genero: Genero;
-
   @RelationId((movie: Movie) => movie.genero)
   generoId: number;
 }

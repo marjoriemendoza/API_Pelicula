@@ -3,23 +3,22 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import bcrypt from "bcrypt";
 import { error } from "console";
+import { paginate } from '../pagination';
 const salround = 10;
 class UserController {
   //List
-  static listUsers = async (_: Request, res: Response) => {
+  static listUsers = async (req: Request, res: Response) => {
     const repoUsers = AppDataSource.getRepository(User);
 
     try {
-      const users = await repoUsers.find({
-        where: { state: true },
-      });
-      return users
-        ? res.json({
-            ok: true,
-            msg: "LIST OF users",
-            users,
-          })
-        : res.json({ ok: false, msg: "DATA NOT FOUND", users });
+      const page = parseInt(req.query.page as string) || 1;
+      const perPage = parseInt(req.query.per_page as string) || 10;
+
+      const paginatedResult = await paginate(repoUsers, page, perPage, { state: true });
+
+      return paginatedResult.data.length > 0
+        ? res.json({ ...paginatedResult, ok: true })
+        : res.json({ ok: false, message: 'Not found' });
     } catch (e) {
       return res.json({
         ok: false,

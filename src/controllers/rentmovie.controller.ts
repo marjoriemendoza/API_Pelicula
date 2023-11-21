@@ -1,11 +1,11 @@
 import { Cliente } from './../models/Cliente';
 import { AppDataSource } from './../data-source';
 import { RentMovie } from "../models/RentMovie.1";
-import { getConnection } from 'typeorm';
 import { Request, Response } from "express";
 import { Movie } from "../models/Movie.1";
 import ClienteController from "../controllers/cliente.controller"
 import { ok } from "assert";
+import { paginate } from '../pagination';
 const rentmovieRepository = AppDataSource.getRepository(RentMovie);
 
 
@@ -63,26 +63,18 @@ class RentMovieController{
 
 
   static getRent = async (req: Request, res: Response) => {
-    // const title = req.query.title || "";
-    
-    // const genero = req.query.genero || ""
-    // const generoId = req.query.generoId || ""
-    // const repoMovie = AppDataSource.getRepository(Movie)
+   
 
     
     try {
-      const rentmovie = await rentmovieRepository.find({ 
-        where :    { 
-          state: true,
-          
-          
-        },
-    
-    
-    });
-      return rentmovie.length > 0
-        ? res.json({ ok: true, rentmovie })
-        : res.json({ ok: false, message: "there's nothig here fool" });
+      const page = parseInt(req.query.page as string) || 1;
+      const perPage = parseInt(req.query.per_page as string) || 10;
+
+      const paginatedResult = await paginate(rentmovieRepository, page, perPage, { state: true });
+
+      return paginatedResult.data.length > 0
+        ? res.json({ ...paginatedResult, ok: true })
+        : res.json({ ok: false, message: 'Not found' });
     } catch (error) {
       return res.json({
         ok: false,

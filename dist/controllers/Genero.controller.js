@@ -12,6 +12,7 @@ var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_source_1 = require("../data-source");
 const Genero_1 = require("../models/Genero");
+const pagination_1 = require("../pagination");
 const generoRepository = data_source_1.AppDataSource.getRepository(Genero_1.Genero);
 class GeneroController {
 }
@@ -38,9 +39,12 @@ GeneroController.createGenero = (req, res) => __awaiter(void 0, void 0, void 0, 
 });
 GeneroController.getGeneros = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const genero = yield generoRepository.find({ where: { state: true } });
-        return genero.length > 0
-            ? res.json({ ok: true, genero }) : res.json({ ok: false, message: "not found" });
+        const page = parseInt(req.query.page) || 1;
+        const perPage = parseInt(req.query.per_page) || 10;
+        const paginatedResult = yield (0, pagination_1.paginate)(generoRepository, page, perPage, { state: true });
+        return paginatedResult.data.length > 0
+            ? res.json(Object.assign(Object.assign({}, paginatedResult), { ok: true }))
+            : res.json({ ok: false, message: 'Not found' });
     }
     catch (error) {
         return res.json({
