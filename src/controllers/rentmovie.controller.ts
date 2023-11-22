@@ -38,7 +38,7 @@ class RentMovieController{
           await rentmovieRepository.save(rent);
           clienteRepository.save(client_f)
           return res.json({ ok: true,  message: "poins are 10 or more get a 15% discount rent was creaetd", });  
-        }else if (client_f.points>20) {
+        }else if (client_f.points>=20) {
           client_f.points = client_f.points + rent.amount
           rent.total= rent.subTotal - (rent.subTotal*0.20)
           await rentmovieRepository.save(rent);
