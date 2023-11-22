@@ -29,7 +29,7 @@ class UserController {
 
   //CREATE
   static createUser = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    const {name, email, password } = req.body;
     const repoUsers = AppDataSource.getRepository(User);
 
     try {
@@ -38,7 +38,7 @@ class UserController {
         return res.json({ ok: false, msg: `Email '${email}' already exists` });
       }
       const users = new User();
-
+      users.name = name;
       users.email = email;
       users.password = password;
       users.hashPassword();
@@ -61,7 +61,7 @@ class UserController {
   //UPDATE
   static updateUser = async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
-    const { email, password } = req.body;
+    const {name, email, password } = req.body;
     const repoUsers = AppDataSource.getRepository(User);
     let users: User;
     try {
@@ -69,8 +69,9 @@ class UserController {
         where: { id, state: true },
       });
       if (!users) {
-        throw new Error("Role dont exist in data base");
+        throw new Error("User dont exist in data base");
       }
+      users.name = name;
       users.email = email;
       users.password = password;
       await repoUsers.save(users);

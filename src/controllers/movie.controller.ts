@@ -2,7 +2,7 @@ import { Movie } from './../models/Movie.1';
 import { Genero } from './../models/Genero';
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
-
+import { paginate } from '../pagination';
 import { getRepository, Like } from 'typeorm';
 const movieRepository = AppDataSource.getRepository(Movie);
 
@@ -42,6 +42,11 @@ class MovieController {
 
     
     try {
+      const page = parseInt(req.query.page as string) || 1;
+      const perPage = parseInt(req.query.per_page as string) || 10;
+
+      const paginatedResult = await paginate(movieRepository, page, perPage, { state: true });
+
       const movie = await movieRepository.find({ 
         where :    { 
           state: true,
@@ -52,8 +57,9 @@ class MovieController {
     
     });
       return movie.length > 0
-        ? res.json({ ok: true, movie })
-        : res.json({ ok: false, message: "there's nothig here fool" });
+        ? res.json({ ok: true, movie, message:"Movie list" })
+        : res.json({ ok: false, message: "Movies not found" });
+        
     } catch (error) {
       return res.json({
         ok: false,
@@ -78,7 +84,7 @@ class MovieController {
     });
       return movie.length > 0
         ? res.json({ ok: true, movie })
-        : res.json({ ok: false, message: "that Id doesn't exist" });
+        : res.json({ ok: false, message: "that Id genre doesn't exist" });
     } catch (error) {
       return res.json({
         ok: false,
@@ -105,7 +111,7 @@ class MovieController {
 
       return movie
         ? res.json({ ok: true, movie })
-        : res.json({ ok: false, message: "No hay nada aquí, tonto" });
+        : res.json({ ok: false, message: "that movie id does not exist" });
     } catch (error) {
       return res.json({
         ok: false,
@@ -123,12 +129,12 @@ class MovieController {
         where: { id, state: true },
       });
       if (!movie) {
-        throw new Error("not found");
+        throw new Error("Movie not found");
       }
       movie.state = false;
       await movieRepository.save(movie);
 
-      return res.json({ok:true,message:"pelicula eliminada"})
+      return res.json({ok:true,message:"Movie was deleted"})
     } catch (error) {
          return res.json({
             ok: false,
@@ -157,7 +163,7 @@ class MovieController {
 
       return movie
         ? res.json({ ok: true, movie })
-        : res.json({ ok: false, message: "there's nothig here pal" });
+        : res.json({ ok: false, message: "Id not found" });
     } catch (error) {
       return res.json({
         ok: false,

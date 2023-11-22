@@ -1,6 +1,8 @@
 import { User } from "../models/User.1";
 import jwt from 'jsonwebtoken'
-import {Response,Request, NextFunction, } from 'express'
+import { decode } from "punycode";
+import {Response,Request, NextFunction } from 'express'
+
 export const Token = async (user: User) => {
   return jwt.sign(
     {
