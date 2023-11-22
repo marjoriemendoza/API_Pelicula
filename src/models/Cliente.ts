@@ -17,7 +17,7 @@ phone:string
 @Column()
 age:string
 
-@Column()
+@Column({default:0})
 points: number
 
 @Column({default:true})
