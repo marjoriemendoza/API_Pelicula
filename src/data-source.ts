@@ -5,7 +5,7 @@ export const AppDataSource=new DataSource({
     type:'mysql',
     host:'localhost',
     username:'root',
-    password:'passwordsql',
+    password:'200409',
     port:3306,
     database:'pelicula_api',
     synchronize:true,

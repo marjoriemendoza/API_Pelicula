@@ -37,7 +37,7 @@ UserController.listUsers = (req, res) => __awaiter(void 0, void 0, void 0, funct
 });
 //CREATE
 UserController.createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
     const repoUsers = data_source_1.AppDataSource.getRepository(User_1_1.User);
     try {
         const userExist = yield repoUsers.findOne({ where: { email } });
@@ -45,6 +45,7 @@ UserController.createUser = (req, res) => __awaiter(void 0, void 0, void 0, func
             return res.json({ ok: false, msg: `Email '${email}' already exists` });
         }
         const users = new User_1_1.User();
+        users.name = name;
         users.email = email;
         users.password = password;
         users.hashPassword();
@@ -66,7 +67,7 @@ UserController.createUser = (req, res) => __awaiter(void 0, void 0, void 0, func
 //UPDATE
 UserController.updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = parseInt(req.params.id);
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
     const repoUsers = data_source_1.AppDataSource.getRepository(User_1_1.User);
     let users;
     try {
@@ -74,8 +75,9 @@ UserController.updateUser = (req, res) => __awaiter(void 0, void 0, void 0, func
             where: { id, state: true },
         });
         if (!users) {
-            throw new Error("Role dont exist in data base");
+            throw new Error("User dont exist in data base");
         }
+        users.name = name;
         users.email = email;
         users.password = password;
         yield repoUsers.save(users);

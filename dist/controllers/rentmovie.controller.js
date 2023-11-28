@@ -19,11 +19,11 @@ class RentMovieController {
 }
 _a = RentMovieController;
 RentMovieController.createRent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { movie_id, id_costumer, loan_date, devolution_date, price, amount, subTotal, total, } = req.body;
+    const { id_movie, id_costumer, loan_date, devolution_date, price, amount, subTotal, total, } = req.body;
     const clienteRepository = data_source_1.AppDataSource.getRepository(Cliente_1.Cliente);
     try {
         const rent = new RentMovie_1_1.RentMovie();
-        rent.movie = movie_id;
+        rent.movie = id_movie;
         rent.cliente = id_costumer;
         rent.loan_date = loan_date;
         rent.devolution_date = devolution_date;
@@ -43,7 +43,7 @@ RentMovieController.createRent = (req, res) => __awaiter(void 0, void 0, void 0,
             clienteRepository.save(client_f);
             return res.json({ ok: true, message: "poins are 10 or more get a 15% discount rent was creaetd", });
         }
-        else if (client_f.points > 20) {
+        else if (client_f.points >= 20) {
             client_f.points = client_f.points + rent.amount;
             rent.total = rent.subTotal - (rent.subTotal * 0.20);
             yield rentmovieRepository.save(rent);
@@ -90,7 +90,7 @@ RentMovieController.getRentbyId = (req, res) => __awaiter(void 0, void 0, void 0
         });
         return movie
             ? res.json({ ok: true, movie })
-            : res.json({ ok: false, message: "No hay nada aquí, tonto" });
+            : res.json({ ok: false, message: "tht rent id does not exist" });
     }
     catch (error) {
         return res.json({

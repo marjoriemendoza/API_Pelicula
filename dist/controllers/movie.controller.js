@@ -12,6 +12,7 @@ var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const Movie_1_1 = require("./../models/Movie.1");
 const data_source_1 = require("../data-source");
+const pagination_1 = require("../pagination");
 const typeorm_1 = require("typeorm");
 const movieRepository = data_source_1.AppDataSource.getRepository(Movie_1_1.Movie);
 class MovieController {
@@ -47,6 +48,9 @@ MovieController.getMovies = (req, res) => __awaiter(void 0, void 0, void 0, func
     const generoId = req.query.generoId || "";
     const repoMovie = data_source_1.AppDataSource.getRepository(Movie_1_1.Movie);
     try {
+        const page = parseInt(req.query.page) || 1;
+        const perPage = parseInt(req.query.per_page) || 10;
+        const paginatedResult = yield (0, pagination_1.paginate)(movieRepository, page, perPage, { state: true });
         const movie = yield movieRepository.find({
             where: {
                 state: true,
@@ -56,8 +60,8 @@ MovieController.getMovies = (req, res) => __awaiter(void 0, void 0, void 0, func
             relations: { genero: true },
         });
         return movie.length > 0
-            ? res.json({ ok: true, movie })
-            : res.json({ ok: false, message: "there's nothig here fool" });
+            ? res.json({ ok: true, movie, message: "Movie list" })
+            : res.json({ ok: false, message: "Movies not found" });
     }
     catch (error) {
         return res.json({
@@ -79,7 +83,7 @@ MovieController.getMoviesGenero = (req, res) => __awaiter(void 0, void 0, void 0
         });
         return movie.length > 0
             ? res.json({ ok: true, movie })
-            : res.json({ ok: false, message: "that Id doesn't exist" });
+            : res.json({ ok: false, message: "that Id genre doesn't exist" });
     }
     catch (error) {
         return res.json({
@@ -101,7 +105,7 @@ MovieController.getMoviesbyId = (req, res) => __awaiter(void 0, void 0, void 0, 
         });
         return movie
             ? res.json({ ok: true, movie })
-            : res.json({ ok: false, message: "No hay nada aquí, tonto" });
+            : res.json({ ok: false, message: "that movie id does not exist" });
     }
     catch (error) {
         return res.json({
@@ -117,11 +121,11 @@ MovieController.DeleteMovie = (req, res) => __awaiter(void 0, void 0, void 0, fu
             where: { id, state: true },
         });
         if (!movie) {
-            throw new Error("not found");
+            throw new Error("Movie not found");
         }
         movie.state = false;
         yield movieRepository.save(movie);
-        return res.json({ ok: true, message: "pelicula eliminada" });
+        return res.json({ ok: true, message: "Movie was deleted" });
     }
     catch (error) {
         return res.json({
@@ -149,7 +153,7 @@ MovieController.updateMovie = (req, res) => __awaiter(void 0, void 0, void 0, fu
         yield movieRepository.save(movie);
         return movie
             ? res.json({ ok: true, movie })
-            : res.json({ ok: false, message: "there's nothig here pal" });
+            : res.json({ ok: false, message: "Id not found" });
     }
     catch (error) {
         return res.json({

@@ -1,5 +1,4 @@
-import {Entity,PrimaryGeneratedColumn,Column, ManyToOne, JoinColumn,} from 'typeorm'
-import {Movie} from './Movie.1'
+import {Entity,PrimaryGeneratedColumn,Column} from 'typeorm'
 @Entity()
 export class Genero{
 

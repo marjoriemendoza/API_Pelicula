@@ -31,29 +31,53 @@ return res.json({
 
     }
 
-  static getGeneros = async(req:Request,res:Response)=>{
+  // static getGeneros = async(req:Request,res:Response)=>{
     
+  //   try {
+  //     const page = parseInt(req.query.page as string) || 1;
+  //     const perPage = parseInt(req.query.per_page as string) || 5;
+
+  //     const paginatedResult = await paginate(generoRepository, page, perPage, { state: true });
+
+  //     return paginatedResult.data.length > 0
+  //       ? res.json({ ...paginatedResult, ok: true })
+  //       : res.json({ ok: false, message: 'Not found' });
+  //   } catch (error) {
+  //       return res.json({
+  //           ok: false,
+  //           message: `Error = ${error}`
+  //       })
+  //   }
+  // }
+
+  static listGeneros = async(req:Request, resp:Response)=>{
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const perPage = parseInt(req.query.per_page as string) || 10;
 
-      const paginatedResult = await paginate(generoRepository, page, perPage, { state: true });
-
-      return paginatedResult.data.length > 0
-        ? res.json({ ...paginatedResult, ok: true })
-        : res.json({ ok: false, message: 'Not found' });
+      const generos = await generoRepository.find({
+        where:{state:true}
+      })
+      return generos.length > 0
+      ?resp.json({
+        ok:true,
+       
+        generos
+      })
+      :resp.json({
+        ok:false,
+        msg:'Not found'
+      })
+      
     } catch (error) {
-        return res.json({
-            ok: false,
-            message: `Error = ${error}`
-        })
+      ok: false
+      Statud_Code: 500
+      message: `error = ${error}`
     }
   }
 
   static BuscarGenero = async (req:Request,res:Response)=>{
     const id = parseInt(req.params.id)
     try {
-        const genero= await generoRepository.findOne({where:{id,state:true}})
+        const genero = await generoRepository.findOne({where:{id,state:true}})
       return genero
       ? res.json({ok:true,genero}): res.json({ok:false,message:"not found"})
     } catch (error) {
@@ -66,7 +90,7 @@ return res.json({
   static DeleteGenero =async(req:Request,res:Response)=>{
          const id = parseInt(req.params.id)
     try {
-        const genero= await generoRepository.findOne({where:{id,state:true}})
+        const genero = await generoRepository.findOne({where:{id,state:true}})
         //si el genero buscado es diferente a los que hay en la base de datos
         if(!genero){
           throw new Error("not found")

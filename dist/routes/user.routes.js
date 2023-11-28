@@ -5,13 +5,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const User_controller_1 = __importDefault(require("../controllers/User.controller"));
-const jwt_validation_1 = require("../jwtvalidation/jwt.validation");
+// import { checkToken } from '../jwtvalidation/jwt.validation';
 const router = (0, express_1.Router)();
 const user = User_controller_1.default;
-router.get('/', jwt_validation_1.checkToken, user.listUsers);
-router.post('/', jwt_validation_1.checkToken, user.createUser);
-router.get('/:id', jwt_validation_1.checkToken, user.byIdUser);
-router.put('/:id', jwt_validation_1.checkToken, user.updateUser);
-router.delete('/:id', jwt_validation_1.checkToken, user.deleteUser);
+// router.get('/', checkToken, user.listUsers)
+// router.post('/', checkToken, user.createUser)
+// router.get('/:id', checkToken, user.byIdUser)
+// router.put('/:id', checkToken, user.updateUser)
+// router.delete('/:id',checkToken, user.deleteUser)
+router.post('/', user.createUser);
+router.put('/:id', user.updateUser);
+router.get('/', user.listUsers);
+router.delete('/:id', user.deleteUser);
+router.get('/:id', user.byIdUser);
 exports.default = router;
 //# sourceMappingURL=user.routes.js.map
