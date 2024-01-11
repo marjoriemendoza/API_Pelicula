@@ -47,11 +47,11 @@ export const checkToken = (req: Request, res: Response, next: NextFunction): voi
   }
 };
 
-// export const ValidateToken = async (token: string) => {
-//   try {
-//     return jwt.verify(token, process.env.TOKEN_KEY);
+export const ValidateToken = async (token: string) => {
+  try {
+    return jwt.verify(token, process.env.TOKEN_KEY);
     
-//   } catch (error) {
-//     null;
-//   }
-// };
+  } catch (error) {
+    null;
+  }
+};

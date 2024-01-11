@@ -18,7 +18,7 @@ class Server{
         this.app.use(
             cors({
                 origin:["http://localhost:5173","http://localhost:5174"],
-            Credential:true       })
+                credentials:true       })
         )
         this.app.use(morgan('dev')),
         this.app.use(express.json({limit:'50mb'})),

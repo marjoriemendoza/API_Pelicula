@@ -9,7 +9,8 @@ const movieRepository = AppDataSource.getRepository(Movie);
 
 class MovieController {
   static createMovie = async (req: Request, res: Response) => {
-    const { title, duration, director, language, image, ranking, generoId} = req.body;
+
+   const { title, duration, director, language, image, ranking, generoId} = req.body;
     const generoRepository = AppDataSource.getRepository(Genero)
 
     try {
@@ -20,9 +21,8 @@ class MovieController {
       movie.language = language;
       movie.image = image;
       movie.ranking = ranking;
-      movie.genero = generoId;
-      
-     
+      movie.genero= generoId;
+
       await movieRepository.save(movie);
       return res.json({
         ok: true,
@@ -45,22 +45,33 @@ class MovieController {
 
     
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const perPage = parseInt(req.query.per_page as string) || 10;
+      // const page = parseInt(req.query.page as string) || 1;
+      // const perPage = parseInt(req.query.per_page as string) || 10;
 
-      const paginatedResult = await paginate(movieRepository, page, perPage, { state: true });
 
-      const movies = await movieRepository.find({ 
+      // const paginatedResult = await paginate(movieRepository, page, perPage, { state: true });
+   const movie = await movieRepository.find({ 
+
         where :    { 
           state: true,
           title:Like(`%${title}%`), 
           genero: {type: Like(`%${genero}%`)},
 
         },
-      relations: {genero:true},
-    });
-      return movies.length > 0
-        ? res.json({ ok: true, movies, message:"Movie list" })
+
+        relations: {
+          genero: true
+        },
+        select: {
+          genero: {
+            type: true
+          }
+        },
+      });
+
+      return movie.length > 0
+        ? res.json({ ok: true, movie, message:"Movie list" })
+
         : res.json({ ok: false, message: "Movies not found" });
         
     } catch (error) {
@@ -70,6 +81,31 @@ class MovieController {
       });
     }
   };
+
+  static ListMovies = async(req:Request,res:Response)=>{
+    try{
+      const movies =await movieRepository.find({
+        relations: {
+          genero: true
+        },
+        select: {
+          genero: {
+            type: true
+          }
+        },
+        where:{state:true}
+      })
+      return movies.length > 0
+      ? res.json({ok:true,movies}): res.json({ok:false,message:"not found"})
+    }
+    catch (error) {
+      return res.json({
+          ok: false,
+          message: `Error = ${error}`
+      })
+  }
+}
+
 
   static getMoviesGenero = async (req: Request, res: Response) => {
     const generoId = Number(req.params.id) || 0;   
@@ -100,21 +136,28 @@ class MovieController {
 
   static getMoviesbyId = async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
-    const generoId = req.query.generoId || "";
-
-    try {
+    
+     try {
       const movie = await movieRepository.findOne({
         where: {
           id,
           state: true,
           
         },
-        relations: {genero: true}, 
+        relations: {
+          genero: true
+        },
+        select: {
+          genero: {
+            type: true
+          }
+        },
       });
 
       return movie
-        ? res.json({ ok: true, movie })
-        : res.json({ ok: false, message: "that movie id does not exist" });
+  ? res.json({ ok: true, data: movie })
+  : res.json({ ok: false, error: "Movie not found" });
+
     } catch (error) {
       return res.json({
         ok: false,
@@ -149,7 +192,9 @@ class MovieController {
  
   static updateMovie = async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
-    const { title, duration, director, language, image, ranking, generoId} = req.body;
+
+    const { title, duration, director, language, image, ranking, generoId  } = req.body;
+
     let movie: Movie;
     try {
       movie = await movieRepository.findOne({ where: { id, state: true } });
@@ -162,11 +207,12 @@ class MovieController {
       movie.language = language;
       movie.image = image;
       movie.ranking = ranking;
-      movie.genero = generoId;
+      movie.genero= generoId;
       await movieRepository.save(movie);
 
       return movie
-        ? res.json({ ok: true, movie})
+        ? res.json({ ok: true, movies: [movie] })
+
         : res.json({ ok: false, message: "Id not found" });
     } catch (error) {
       return res.json({

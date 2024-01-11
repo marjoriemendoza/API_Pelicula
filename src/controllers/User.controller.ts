@@ -5,28 +5,31 @@ import bcrypt from "bcrypt";
 import { error } from "console";
 import { paginate } from '../pagination';
 const salround = 10;
+
+const userRepository = AppDataSource.getRepository(User)
 class UserController {
   //List
-  static listUsers = async (req: Request, res: Response) => {
-    const repoUsers = AppDataSource.getRepository(User);
+  // static listUsers = async (req: Request, res: Response) => {
+  //   const repoUsers = AppDataSource.getRepository(User);
 
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const perPage = parseInt(req.query.per_page as string) || 10;
+  //   try {
+  //     const page = parseInt(req.query.page as string) || 1;
+  //     const perPage = parseInt(req.query.per_page as string) || 10;
 
-      const paginatedResult = await paginate(repoUsers, page, perPage, { state: true });
+  //     const paginatedResult = await paginate(repoUsers, page, perPage, { state: true });
 
-      return paginatedResult.data.length > 0
-        ? res.json({ ...paginatedResult, ok: true })
-        : res.json({ ok: false, message: 'Not found' });
-    } catch (e) {
-      return res.json({
-        ok: false,
-        msg: `ERROR => ${e}`,
-      });
-    }
-  };
+  //     return paginatedResult.data.length > 0
+  //       ? res.json({ ...paginatedResult, ok: true })
+  //       : res.json({ ok: false, message: 'Not found' });
+  //   } catch (e) {
+  //     return res.json({
+  //       ok: false,
+  //       msg: `ERROR => ${e}`,
+  //     });
+  //   }
+  // };
 
+  
   //CREATE
   static createUser = async (req: Request, res: Response) => {
     const {name, email, password } = req.body;
@@ -57,6 +60,22 @@ class UserController {
       });
     }
   };
+
+  static ListUsers = async(req:Request,res:Response)=>{
+    try{
+      const users =await userRepository.find({
+        where:{state:true}
+      })
+      return users.length > 0
+      ? res.json({ok:true,users}): res.json({ok:false,message:"not found"})
+    }
+    catch (error) {
+      return res.json({
+          ok: false,
+          message: `Error = ${error}`
+      })
+  }
+}
 
   //UPDATE
   static updateUser = async (req: Request, res: Response) => {

@@ -20,6 +20,7 @@ class authController {
         });
       }
       const tokenb = await Token(user);
+      console.log('Generated Token:', tokenb);
       return res.json({
         ok: true,
         message: "correct",
