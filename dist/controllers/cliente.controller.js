@@ -12,7 +12,6 @@ var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_source_1 = require("../data-source");
 const Cliente_1 = require("../models/Cliente");
-const pagination_1 = require("../pagination");
 const clienteRepository = data_source_1.AppDataSource.getRepository(Cliente_1.Cliente);
 class ClienteController {
 }
@@ -40,20 +39,40 @@ ClienteController.createCliente = (req, res) => __awaiter(void 0, void 0, void 0
         });
     }
 });
-ClienteController.getClientes = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// static getClientes = async(req:Request,res:Response)=>{
+//   try {
+//     const page = parseInt(req.query.page as string) || 1;
+//     const perPage = parseInt(req.query.per_page as string) || 10;
+//     const paginatedResult = await paginate(clienteRepository, page, perPage, { state: true });
+//     return paginatedResult.data.length > 0
+//       ? res.json({ ...paginatedResult, ok: true })
+//       : res.json({ ok: false, message: 'Not found' });
+//   } catch (error) {
+//       return res.json({
+//           ok: false,
+//           message: `Error = ${error}`
+//       })
+//   }
+// }
+ClienteController.listClient = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const perPage = parseInt(req.query.per_page) || 10;
-        const paginatedResult = yield (0, pagination_1.paginate)(clienteRepository, page, perPage, { state: true });
-        return paginatedResult.data.length > 0
-            ? res.json(Object.assign(Object.assign({}, paginatedResult), { ok: true }))
-            : res.json({ ok: false, message: 'Not found' });
+        const clients = yield clienteRepository.find({
+            where: { state: true }
+        });
+        return clients.length > 0
+            ? res.json({
+                ok: true,
+                clients
+            })
+            : res.json({
+                ok: false,
+                message: 'Not found'
+            });
     }
     catch (error) {
-        return res.json({
-            ok: false,
-            message: `Error = ${error}`
-        });
+        ok: false;
+        STATUS_CODES: 500;
+        message: `Error= ${error}`;
     }
 });
 ClienteController.BuscarCliente = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

@@ -13,7 +13,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Cliente_1 = require("./../models/Cliente");
 const data_source_1 = require("./../data-source");
 const RentMovie_1_1 = require("../models/RentMovie.1");
-const pagination_1 = require("../pagination");
 const rentmovieRepository = data_source_1.AppDataSource.getRepository(RentMovie_1_1.RentMovie);
 class RentMovieController {
 }
@@ -61,20 +60,50 @@ RentMovieController.createRent = (req, res) => __awaiter(void 0, void 0, void 0,
         return res.json({ ok: false, message: `error that movie does not exist = ${error.message}`, });
     }
 });
-RentMovieController.getRent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// static getRent = async (req: Request, res: Response) => {   
+//   try {
+//     const page = parseInt(req.query.page as string) || 1;
+//     const perPage = parseInt(req.query.per_page as string) || 10;
+//     const paginatedResult = await paginate(rentmovieRepository, page, perPage, { state: true });
+//     return paginatedResult.data.length > 0
+//       ? res.json({ ...paginatedResult, ok: true })
+//       : res.json({ ok: false, message: 'Not found' });
+//   } catch (error) {
+//     return res.json({
+//       ok: false,
+//       message: `error = ${error.message}`,
+//     });
+//   }
+// };
+RentMovieController.listRent = (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+    const movie = req.query.movie || "";
+    const id_movie = req.query.id_movie || "";
+    const cliente = req.query.id_costumer || "";
+    const id_costumer = req.query.id_costumer || "";
     try {
-        const page = parseInt(req.query.page) || 1;
-        const perPage = parseInt(req.query.per_page) || 10;
-        const paginatedResult = yield (0, pagination_1.paginate)(rentmovieRepository, page, perPage, { state: true });
-        return paginatedResult.data.length > 0
-            ? res.json(Object.assign(Object.assign({}, paginatedResult), { ok: true }))
-            : res.json({ ok: false, message: 'Not found' });
+        const rentmovie = yield rentmovieRepository.find({
+            where: {
+                state: true
+            },
+            relations: {
+                movie: true,
+                cliente: true
+            }
+        });
+        return rentmovie.length > 0
+            ? resp.json({
+                ok: true,
+                rentmovie
+            })
+            : resp.json({
+                ok: false,
+                msg: 'Not found',
+            });
     }
     catch (error) {
-        return res.json({
-            ok: false,
-            message: `error = ${error.message}`,
-        });
+        ok: false;
+        Status_Code: 500;
+        msg: `error = ${error}`;
     }
 });
 RentMovieController.getRentbyId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -105,16 +134,12 @@ RentMovieController.updateRentMovie = (req, res) => __awaiter(void 0, void 0, vo
     let rentmovie;
     try {
         rentmovie = yield rentmovieRepository.findOne({ where: { id, state: true } });
-        if (!id) {
-            throw new Error("not found");
-        }
-        const rent = new RentMovie_1_1.RentMovie();
-        rentmovie.id_movie = id_movie;
-        rentmovie.id_costumer = id_costumer;
+        rentmovie.movie = id_movie;
+        rentmovie.cliente = id_costumer;
         rentmovie.loan_date = loan_date;
         rentmovie.devolution_date = devolution_date;
         rentmovie.price = price;
-        rent.amount = amount;
+        rentmovie.amount = amount;
         yield rentmovieRepository.save(rentmovie);
         return rentmovie
             ? res.json({ ok: true, rentmovie: "renta actualizada" })

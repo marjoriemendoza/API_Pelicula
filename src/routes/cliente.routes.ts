@@ -4,7 +4,7 @@ import { Router } from "express"
 import ClienteController, {} from "../controllers/cliente.controller"
 // import { checkToken } from '../jwtvalidation/jwt.validation';
 const router = Router();
-const cliente=ClienteController
+const cliente = ClienteController
 
 // router.post("/", checkToken, cliente.createCliente)
 // router.get("/", checkToken, cliente.getClientes)
@@ -13,5 +13,10 @@ const cliente=ClienteController
 // router.put("/:id",checkToken, cliente.UpdateCliente)
 
 router.post("/",  cliente.createCliente)
+router.get("/", cliente.listClient)
+router.get("/:id", cliente.BuscarCliente)
+router.delete("/:id", cliente.DeleteCliente)
+router.put("/:id", cliente.UpdateCliente)
+
 
 export default router

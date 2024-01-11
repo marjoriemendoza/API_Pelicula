@@ -39,11 +39,11 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     (0, typeorm_1.CreateDateColumn)(),
-    __metadata("design:type", Date)
+    __metadata("design:type", String)
 ], RentMovie.prototype, "loan_date", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
-    __metadata("design:type", Date)
+    __metadata("design:type", String)
 ], RentMovie.prototype, "devolution_date", void 0);
 __decorate([
     (0, typeorm_1.Column)(),

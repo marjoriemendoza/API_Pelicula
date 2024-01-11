@@ -14,5 +14,9 @@ const cliente = cliente_controller_1.default;
 // router.delete("/:id",checkToken, cliente.DeleteCliente)
 // router.put("/:id",checkToken, cliente.UpdateCliente)
 router.post("/", cliente.createCliente);
+router.get("/", cliente.listClient);
+router.get("/:id", cliente.BuscarCliente);
+router.delete("/:id", cliente.DeleteCliente);
+router.put("/:id", cliente.UpdateCliente);
 exports.default = router;
 //# sourceMappingURL=cliente.routes.js.map

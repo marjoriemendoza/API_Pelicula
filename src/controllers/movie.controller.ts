@@ -4,11 +4,14 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { paginate } from '../pagination';
 import { getRepository, Like } from 'typeorm';
+
 const movieRepository = AppDataSource.getRepository(Movie);
 
 class MovieController {
   static createMovie = async (req: Request, res: Response) => {
-    const { title, duration, director, language, image, ranking, genero } = req.body;
+    const { title, duration, director, language, image, ranking, generoId} = req.body;
+    const generoRepository = AppDataSource.getRepository(Genero)
+
     try {
       const movie = new Movie();
       movie.title = title;    
@@ -17,7 +20,7 @@ class MovieController {
       movie.language = language;
       movie.image = image;
       movie.ranking = ranking;
-      movie.genero= genero;
+      movie.genero = generoId;
       
      
       await movieRepository.save(movie);
@@ -47,17 +50,17 @@ class MovieController {
 
       const paginatedResult = await paginate(movieRepository, page, perPage, { state: true });
 
-      const movie = await movieRepository.find({ 
+      const movies = await movieRepository.find({ 
         where :    { 
           state: true,
           title:Like(`%${title}%`), 
           genero: {type: Like(`%${genero}%`)},
+
         },
       relations: {genero:true},
-    
     });
-      return movie.length > 0
-        ? res.json({ ok: true, movie, message:"Movie list" })
+      return movies.length > 0
+        ? res.json({ ok: true, movies, message:"Movie list" })
         : res.json({ ok: false, message: "Movies not found" });
         
     } catch (error) {
@@ -84,7 +87,7 @@ class MovieController {
     });
       return movie.length > 0
         ? res.json({ ok: true, movie })
-        : res.json({ ok: false, message: "that Id genre doesn't exist" });
+        : res.json({ ok: false, message: "that Id genero doesn't exist" });
     } catch (error) {
       return res.json({
         ok: false,
@@ -143,9 +146,10 @@ class MovieController {
     }
   };
 
+ 
   static updateMovie = async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
-    const { title, duration, director, language, image, ranking, genero  } = req.body;
+    const { title, duration, director, language, image, ranking, generoId} = req.body;
     let movie: Movie;
     try {
       movie = await movieRepository.findOne({ where: { id, state: true } });
@@ -158,11 +162,11 @@ class MovieController {
       movie.language = language;
       movie.image = image;
       movie.ranking = ranking;
-      movie.genero= genero;
+      movie.genero = generoId;
       await movieRepository.save(movie);
 
       return movie
-        ? res.json({ ok: true, movie })
+        ? res.json({ ok: true, movie})
         : res.json({ ok: false, message: "Id not found" });
     } catch (error) {
       return res.json({

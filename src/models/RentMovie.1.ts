@@ -20,10 +20,10 @@ export class RentMovie
 
   @Column()
   @CreateDateColumn()
-  loan_date: Date
+  loan_date: string
 
   @Column()
-  devolution_date: Date
+  devolution_date: string
 
   @Column()
   amount: number

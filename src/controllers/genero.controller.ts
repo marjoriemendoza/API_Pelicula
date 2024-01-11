@@ -52,7 +52,6 @@ return res.json({
 
   static listGeneros = async(req:Request, resp:Response)=>{
     try {
-
       const generos = await generoRepository.find({
         where:{state:true}
       })

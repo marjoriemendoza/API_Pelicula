@@ -59,23 +59,57 @@ class RentMovieController{
   };
 
 
-  static getRent = async (req: Request, res: Response) => {   
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const perPage = parseInt(req.query.per_page as string) || 10;
+  // static getRent = async (req: Request, res: Response) => {   
+  //   try {
+  //     const page = parseInt(req.query.page as string) || 1;
+  //     const perPage = parseInt(req.query.per_page as string) || 10;
 
-      const paginatedResult = await paginate(rentmovieRepository, page, perPage, { state: true });
+  //     const paginatedResult = await paginate(rentmovieRepository, page, perPage, { state: true });
 
-      return paginatedResult.data.length > 0
-        ? res.json({ ...paginatedResult, ok: true })
-        : res.json({ ok: false, message: 'Not found' });
-    } catch (error) {
-      return res.json({
-        ok: false,
-        message: `error = ${error.message}`,
-      });
-    }
-  };
+  //     return paginatedResult.data.length > 0
+  //       ? res.json({ ...paginatedResult, ok: true })
+  //       : res.json({ ok: false, message: 'Not found' });
+  //   } catch (error) {
+  //     return res.json({
+  //       ok: false,
+  //       message: `error = ${error.message}`,
+  //     });
+  //   }
+  // };
+
+  static listRent = async(req:Request, resp:Response)=>{
+     const movie = req.query.movie || ""
+     const id_movie = req.query.id_movie || ""
+     const cliente =req.query.id_costumer || ""
+     const id_costumer = req.query.id_costumer || ""
+    
+    try{
+      const rentmovie = await rentmovieRepository.find({
+        where:{
+          state:true
+        },
+        relations:{
+          movie:true,
+          cliente: true
+        }
+        
+      })
+      return rentmovie.length> 0
+      ?resp.json({
+        ok:true,
+        rentmovie
+      })
+      :resp.json({
+        ok:false,
+        msg: 'Not found',
+      })
+      
+     } catch(error){
+      ok:false
+      Status_Code: 500
+      msg: `error = ${error}`
+     }
+  } 
 
   static getRentbyId = async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
@@ -108,16 +142,13 @@ class RentMovieController{
     let rentmovie: RentMovie;
     try {
       rentmovie = await rentmovieRepository.findOne({ where: { id, state: true } });
-      if (!id) {
-        throw new Error("not found");
-      }
-      const rent = new RentMovie();
-      rentmovie.id_movie = id_movie;
-      rentmovie.id_costumer = id_costumer;
+      
+      rentmovie.movie = id_movie;
+      rentmovie.cliente = id_costumer;
       rentmovie.loan_date = loan_date;
       rentmovie.devolution_date = devolution_date
       rentmovie.price = price
-      rent.amount = amount
+      rentmovie.amount = amount
       
       await rentmovieRepository.save(rentmovie);
 
